@@ -15,12 +15,13 @@ app.post(
 	tokenAuthentication,
 	async (req: Request, res: Response) => {
 		const body = req.body;
-		console.log(body);
+		console.log(typeof body.amount);
 		const token = req.headers["token"] as string;
 		const { amount, userid }: { amount: number; userid: number } = req.body;
 		const provider = req.params.provider as string;
 
 		try {
+			console.log(body);
 			const transaction = await prisma.onRampTransactions.create({
 				data: {
 					user_id: userid,
@@ -31,7 +32,8 @@ app.post(
 					state: "Processings",
 				},
 			});
-
+			await new Promise((r) => setTimeout(r, 3000));
+			console.log(2);
 			if (transaction) {
 				await prisma.$transaction([
 					prisma.balance.update({
@@ -57,6 +59,7 @@ app.post(
 					msg: "SUCCESS",
 				});
 			} else {
+				console.log(3);
 				await prisma.$transaction([
 					prisma.onRampTransactions.create({
 						data: {
